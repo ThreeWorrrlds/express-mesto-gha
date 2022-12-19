@@ -1,0 +1,20 @@
+{
+  "userOne": {
+    "_id": "639b50fcf17166c2d592e6e4",
+    "name": "Test",
+    "about": "Testabout",
+    "avatar": "Testavatar"
+  },
+  "userTwo": {
+    "_id": "999b50fcf134554645ff656gd",
+    "name": "Igoryan",
+    "about": "Champion",
+    "avatar": "Moskya"
+  },
+  "userThree": {
+    "_id": "777b50asdasdfcf134556gd",
+    "name": "Geralt",
+    "about": "Monster Slayer",
+    "avatar": "Gwinblade"
+  }
+}
