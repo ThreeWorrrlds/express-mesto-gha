@@ -24,10 +24,7 @@ app.use(usersRoutes);
 app.use(cardsRoutes);
 
 async function main() {
-  await mongoose.connect(MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(MONGO_URL, {});
   await app.listen(PORT);
 }
 main();
