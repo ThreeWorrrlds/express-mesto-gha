@@ -1,14 +1,10 @@
 import express from 'express';
 
-import * as dotenv from 'dotenv';
-
 import mongoose from 'mongoose';
 
 import usersRoutes from './routes/users';
 
 import cardsRoutes from './routes/cards';
-
-dotenv.config();
 
 const app = express();
 const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
