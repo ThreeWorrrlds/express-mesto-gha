@@ -4,9 +4,9 @@ import * as dotenv from 'dotenv';
 
 import mongoose from 'mongoose';
 
-import usersRoutes from './routes/users.js';
+import usersRoutes from './routes/users';
 
-import cardsRoutes from './routes/cards.js';
+import cardsRoutes from './routes/cards';
 
 dotenv.config();
 
