@@ -4,9 +4,9 @@ import * as dotenv from 'dotenv';
 
 import mongoose from 'mongoose';
 
-import usersRoutes from './routes/users';
+import usersRoutes from './routes/users.js';
 
-import cardsRoutes from './routes/cards';
+import cardsRoutes from './routes/cards.js';
 
 dotenv.config();
 
@@ -24,7 +24,10 @@ app.use(usersRoutes);
 app.use(cardsRoutes);
 
 async function main() {
-  await mongoose.connect(MONGO_URL, {});
+  await mongoose.connect(MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
   await app.listen(PORT);
 }
 main();
