@@ -18,6 +18,9 @@ app.use((req, res, next) => {
 
 app.use(usersRoutes);
 app.use(cardsRoutes);
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Не верен путь этот...' });
+});
 
 async function main() {
   await mongoose.connect(MONGO_URL, {

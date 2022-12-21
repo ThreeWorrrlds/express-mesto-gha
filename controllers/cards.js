@@ -29,16 +29,19 @@ export const createCard = async (req, res) => {
 };
 
 export const deleteCardById = async (req, res) => {
-  try {
-    const cardOfDel = await CardModel.findByIdAndRemove(req.params.cardId);
-    res.status(200).send(cardOfDel);
-  } catch (err) {
-    if (err.name === 'NotFound') {
-      res.status(404).send({ message: 'Карточка с указанным id не найдена' });
-    } else {
-      res.status(500).send({ message: `Произошла ошибка: ${err.name} текст ошибки: ${err.message}` });
-    }
-  }
+  await CardModel.findByIdAndRemove(req.params.cardId)
+    .orFail(new Error('NotFound'))
+    .then((responce) => res.status(200).send({ message: `Карточка ${req.params.cardId} удалена ${responce}` }))
+    .catch((err) => {
+      /* console.log(`ВОТ ТУТ!!! ${err}`); */
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные для удаления карточки.' });
+      } else if (err.message === 'NotFound') {
+        res.status(404).send({ message: 'Карточка с указанным id не найдена' });
+      } else {
+        res.status(500).send({ message: `Произошла ошибка: ${err.name} текст ошибки: ${err.message}` });
+      }
+    });
 };
 
 export const setLikeByCardId = async (req, res) => {
