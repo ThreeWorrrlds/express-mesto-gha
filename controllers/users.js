@@ -22,7 +22,11 @@ export const getUserById = async (req, res) => {
       res.status(404).send({ message: 'Пользователь не найден' });
     }
   } catch (err) {
-    res.status(500).send({ message: 'Ошибка', ...err });
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Не валидный id', ...err });
+    } else {
+      res.status(500).send({ message: 'Ошибка', ...err });
+    }
   }
 };
 
