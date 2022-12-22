@@ -50,7 +50,7 @@ export const updateUserInfo = async (req, res) => {
     const newInfo = await UserModel.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true, runValidators: true, upsert: true },
+      { new: true, runValidators: true, upsert: false },
     );
     res.status(200).send(newInfo);
   } catch (err) {
@@ -68,7 +68,7 @@ export const updateUserAvatar = async (req, res) => {
     const newAvatar = await UserModel.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true, upsert: true },
+      { new: true, runValidators: true, upsert: false },
     );
     res.status(200).send(newAvatar);
   } catch (err) {

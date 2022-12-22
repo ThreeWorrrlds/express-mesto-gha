@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import validator from 'validator';
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -16,6 +18,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     required: true,
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: 'Некорректный URL',
+    },
   },
 });
 export default mongoose.model('user', userSchema);
