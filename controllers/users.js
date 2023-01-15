@@ -25,12 +25,11 @@ export const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Некорректные данные при создании пользователя'));
+      }
+      if (err.code === 11000) {
+        next(new Conflict('Такой пользователь уже существует'));
       } else {
-        if (err.code === 11000) {
-          next(new Conflict('Такой пользователь уже существует'));
-        } else {
-          next(err);
-        }
+        next(err);
       }
     });
 };
@@ -41,9 +40,8 @@ export const login = async (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'secret-token', { expiresIn: '7d' });
       return res.send({ token });
-      next();
     })
-    .catch((err) => {
+    .catch(() => {
       next(new Unauthorized('Неправильный логин или пароль'));
     });
 };

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// eslint-disable-next-line consistent-return
 const auth = async (req, res, next) => {
   const { authorization } = await req.headers;
 
