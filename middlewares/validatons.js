@@ -30,6 +30,24 @@ export const validateUserId = celebrate({
     }).unknown(),
 });
 
+export const validateUserUpdateInfo = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }).unknown(),
+});
+
+export const validateUserUpdateAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message('Некорректный URL');
+    }),
+  }).unknown(),
+});
+
 export const validateCardData = celebrate({
   body: Joi.object()
     .keys({
