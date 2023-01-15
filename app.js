@@ -6,12 +6,24 @@ import express from 'express';
 
 import mongoose from 'mongoose';
 
+import { errors } from 'celebrate';
+
 import usersRoutes from './routes/users';
 
 import cardsRoutes from './routes/cards';
 
+import {
+  login, createUser,
+} from './controllers/users';
+
+import auth from './middlewares/auth';
+
+import errorHandler from './middlewares/error-handler';
+
+import { validateUserData } from './middlewares/validatons';
+
 const app = express();
-const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
+const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
@@ -25,18 +37,22 @@ app.use(limiter);
 app.use(helmet());
 app.disable('x-powered-by');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '639db5782d3c577ab9f30a72',
-  };
-  next();
-});
+/* app.use(express.json()); */
 
+app.post('/signup', express.json(), validateUserData, createUser);
+app.post('/signin', express.json(), validateUserData, login);
+
+app.use(auth);
 app.use(usersRoutes);
 app.use(cardsRoutes);
+
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Не верен путь этот...' });
 });
+
+app.use(errors());
+
+app.use(errorHandler);
 
 async function main() {
   await mongoose.connect(MONGO_URL, {
@@ -45,5 +61,4 @@ async function main() {
   });
   await app.listen(PORT);
 }
-
 main();

@@ -1,19 +1,21 @@
 import express from 'express';
 
+import { validateUserData, validateUserId } from '../middlewares/validatons';
+
 import {
-  getUsers, getUserById, createUser, updateUserInfo, updateUserAvatar,
+  getUsers, getUserById, updateUserInfo, updateUserAvatar, getCurrentUser,
 } from '../controllers/users';
 
 const usersRoutes = express.Router();
 
+usersRoutes.get('/users/me', getCurrentUser);
+
 usersRoutes.get('/users', getUsers);
 
-usersRoutes.get('/users/:id', getUserById);
+usersRoutes.get('/users/:id', validateUserId, getUserById);
 
-usersRoutes.post('/users', express.json(), createUser);
+usersRoutes.patch('/users/me', express.json(), validateUserData, updateUserInfo);
 
-usersRoutes.patch('/users/me', express.json(), updateUserInfo);
-
-usersRoutes.patch('/users/me/avatar', express.json(), updateUserAvatar);
+usersRoutes.patch('/users/me/avatar', express.json(), validateUserData, updateUserAvatar);
 
 export default usersRoutes;

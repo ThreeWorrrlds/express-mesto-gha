@@ -1,50 +1,101 @@
+import bcrypt from 'bcryptjs';
+
+import jwt from 'jsonwebtoken';
+
 import UserModel from '../models/User';
 
-export const getUsers = async (req, res) => {
+import BadRequestError from '../errors/bad-request-error';
+
+import Conflict from '../errors/conflict';
+
+import NotFound from '../errors/not-found';
+
+import Unauthorized from '../errors/unauthorized';
+
+export const createUser = (req, res, next) => {
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => UserModel.create({
+      email: req.body.email,
+      password: hash,
+      name: req.body.name,
+      about: req.body.about,
+      avatar: req.body.avatar,
+    }))
+    .then((user) => { res.status(201).send(user); next(); })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Некорректные данные при создании пользователя'));
+      } else {
+        if (err.code === 11000) {
+          next(new Conflict('Такой пользователь уже существует'));
+        } else {
+          next(err);
+        }
+      }
+    });
+};
+
+export const login = async (req, res, next) => {
+  const { email, password } = req.body;
+  return UserModel.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'secret-token', { expiresIn: '7d' });
+      return res.send({ token });
+      next();
+    })
+    .catch((err) => {
+      next(new Unauthorized('Неправильный логин или пароль'));
+    });
+};
+
+export const getCurrentUser = async (req, res, next) => {
+  try {
+    const currentUser = await UserModel.findById(req.user._id);
+    if (currentUser) {
+      res.status(200).send(currentUser);
+    } else {
+      next(new NotFound('Пользователь не найден'));
+    }
+  } catch (err) {
+    if (err.name === 'CastError') {
+      next(new BadRequestError('Невалидный id'));
+    } else {
+      next(err);
+    }
+  }
+};
+
+export const getUsers = async (req, res, next) => {
   try {
     const users = await UserModel.find({});
     if (users) {
       res.status(200).send(users);
     } else {
-      res.status(404).send({ message: 'Пользователи не найдены' });
+      next(new NotFound('Пользователи не найдены'));
     }
   } catch (err) {
-    res.status(500).send({ message: 'Ошибка', ...err });
+    next(err);
   }
 };
 
-export const getUserById = async (req, res) => {
+export const getUserById = async (req, res, next) => {
   try {
     const user = await UserModel.findById(req.params.id);
     if (user) {
       res.status(200).send(user);
     } else {
-      res.status(404).send({ message: 'Пользователь не найден' });
+      next(new NotFound('Пользователь не найден'));
     }
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: 'Не валидный id', ...err });
+      next(new BadRequestError('Невалидный id'));
     } else {
-      res.status(500).send({ message: 'Ошибка', ...err });
+      next(err);
     }
   }
 };
 
-export const createUser = async (req, res) => {
-  try {
-    const { name, about, avatar } = req.body;
-    const user = await UserModel.create({ name, about, avatar });
-    res.status(201).send(user);
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Некорректные данные при создании пользователя' });
-    } else {
-      res.status(500).send({ message: `Произошла ошибка: ${err.name} текст ошибки: ${err.message}` });
-    }
-  }
-};
-
-export const updateUserInfo = async (req, res) => {
+export const updateUserInfo = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const newInfo = await UserModel.findByIdAndUpdate(
@@ -55,14 +106,14 @@ export const updateUserInfo = async (req, res) => {
     res.status(200).send(newInfo);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Некорректные данные при обновлении профиля' });
+      next(new BadRequestError('Некорректные данные при обновлении профиля'));
     } else {
-      res.status(500).send({ message: `Произошла ошибка: ${err.name} текст ошибки: ${err.message}` });
+      next(err);
     }
   }
 };
 
-export const updateUserAvatar = async (req, res) => {
+export const updateUserAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
     const newAvatar = await UserModel.findByIdAndUpdate(
@@ -73,9 +124,9 @@ export const updateUserAvatar = async (req, res) => {
     res.status(200).send(newAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Некорректные данные при обновлении аватара' });
+      next(new BadRequestError('Некорректные данные при обновлении аватара'));
     } else {
-      res.status(500).send({ message: `Произошла ошибка: ${err.name} текст ошибки: ${err.message}` });
+      next(err);
     }
   }
 };
