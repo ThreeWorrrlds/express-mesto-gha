@@ -14,8 +14,8 @@ usersRoutes.get('/users', getUsers);
 
 usersRoutes.get('/users/:id', validateUserId, getUserById);
 
-usersRoutes.patch('/users/me', express.json(), validateUserUpdateInfo, updateUserInfo);
+usersRoutes.patch('/users/me', validateUserUpdateInfo, updateUserInfo);
 
-usersRoutes.patch('/users/me/avatar', express.json(), validateUserUpdateAvatar, updateUserAvatar);
+usersRoutes.patch('/users/me/avatar', validateUserUpdateAvatar, updateUserAvatar);
 
 export default usersRoutes;

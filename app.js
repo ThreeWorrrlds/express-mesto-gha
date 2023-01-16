@@ -22,6 +22,8 @@ import errorHandler from './middlewares/error-handler';
 
 import { validateUserData } from './middlewares/validatons';
 
+import NotFound from './errors/not-found';
+
 const app = express();
 const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
@@ -37,17 +39,16 @@ app.use(limiter);
 app.use(helmet());
 app.disable('x-powered-by');
 
-/* app.use(express.json()); */
-
-app.post('/signup', express.json(), validateUserData, createUser);
-app.post('/signin', express.json(), validateUserData, login);
+app.use(express.json());
+app.post('/signup', validateUserData, createUser);
+app.post('/signin', validateUserData, login);
 
 app.use(auth);
 app.use(usersRoutes);
 app.use(cardsRoutes);
 
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Не верен путь этот...' });
+app.use('*', (req, res, next) => {
+  next(new NotFound('Не верен путь этот...'));
 });
 
 app.use(errors());

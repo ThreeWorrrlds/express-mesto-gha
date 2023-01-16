@@ -10,9 +10,9 @@ const cardsRoutes = express.Router();
 
 cardsRoutes.get('/cards', getCards);
 
-cardsRoutes.post('/cards', express.json(), validateCardData, createCard);
+cardsRoutes.post('/cards', validateCardData, createCard);
 
-cardsRoutes.delete('/cards/:cardId', express.json(), validateCardId, deleteCardById);
+cardsRoutes.delete('/cards/:cardId', validateCardId, deleteCardById);
 
 cardsRoutes.put('/cards/:cardId/likes', validateCardId, setLikeByCardId);
 
