@@ -5,7 +5,6 @@ import Unauthorized from '../errors/unauthorized';
 // eslint-disable-next-line consistent-return
 const auth = async (req, res, next) => {
   const { authorization } = await req.headers;
-  console.log(authorization);
   if (!authorization || !authorization.startsWith('Bearer ')) {
     next(new Unauthorized('Необходима авторизация'));
   }
